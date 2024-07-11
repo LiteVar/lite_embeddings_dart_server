@@ -2,6 +2,7 @@
 # Created by `dart pub`
 .dart_tool/
 .idea/
+.log/
 
 pubspec.lock
 lite_embeddings_dart_server.iml
