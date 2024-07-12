@@ -86,7 +86,7 @@ class EmbeddingsController {
     final data = jsonDecode(payload);
 
     try {
-      final DocumentDto documentDto = DocumentDto.fromJson(data);
+      final DocsDto documentDto = DocsDto.fromJson(data);
       logger.log(LogModule.http, "Request createDocs", detail: payload, level: Level.FINEST);
 
       DocsInfoDto docsInfoDto = await embeddingsService.createDocs(documentDto);
@@ -211,10 +211,10 @@ class EmbeddingsController {
       final DocsIdDto docsIdDto = DocsIdDto.fromJson(data);
       logger.log(LogModule.http, "Request listSegment", detail: payload, level: Level.FINEST);
 
-      DocumentInfoDto? documentInfoDto = await embeddingsService.listSegments(docsIdDto);
+      DocsFullInfoDto? docsFullInfoDto = await embeddingsService.listSegments(docsIdDto);
 
-      logger.log(LogModule.http, "Response listSegment", detail: jsonEncode(documentInfoDto?.toJson()));
-      return Response.ok(jsonEncode(documentInfoDto?.toJson()));
+      logger.log(LogModule.http, "Response listSegment", detail: jsonEncode(docsFullInfoDto?.toJson()));
+      return Response.ok(jsonEncode(docsFullInfoDto?.toJson()));
     } on FormatException catch (e) {
       logger.log(LogModule.http, "Response listSegment FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);

@@ -40,8 +40,8 @@ Future<void> main() async {
   /// List Segments
   // String docsId = "<FROM DocsInfoDto>";
   // DocsIdDto docsIdDto = DocsIdDto(docsId: docsId);
-  // DocumentInfoDto? documentInfoDto = await listSegments(docsIdDto);
-  // print("documentInfoDto: ${jsonEncode(documentInfoDto?.toJson())}");
+  // DocsFullInfoDto? docsFullInfoDto = await listSegments(docsIdDto);
+  // print("docsFullInfoDto: ${jsonEncode(docsFullInfoDto?.toJson())}");
 
   /// Query
   // String questText = "Who is author?";
@@ -133,9 +133,9 @@ Future<DocsInfoDto?> createDocsByText(CreateDocsTextDto createDocsTextDto) async
   return null;
 }
 
-Future<DocsInfoDto?> createDocs(DocumentDto documentDto) async {
+Future<DocsInfoDto?> createDocs(DocsDto docsDto) async {
   try {
-    Response response = await dio.post('/docs/create', data: documentDto.toJson());
+    Response response = await dio.post('/docs/create', data: docsDto.toJson());
     final payload = response.data as String;
     final data = jsonDecode(payload);
     DocsInfoDto docsInfoDto = DocsInfoDto.fromJson(data);
@@ -217,15 +217,15 @@ Future<List<QueryResultDto>?> batchQueryDocs(BatchQueryDto batchQueryDto) async 
   return null;
 }
 
-Future<DocumentInfoDto?> listSegments(DocsIdDto docsIdDto) async {
+Future<DocsFullInfoDto?> listSegments(DocsIdDto docsIdDto) async {
   try {
     Response response = await dio.post('/segment/list', data: docsIdDto.toJson());
     final payload = response.data as String?;
     if(payload == null) return null;
     final data = jsonDecode(payload);
-    DocumentInfoDto documentInfoDto = DocumentInfoDto.fromJson(data);
-    print("[listSegment->RES] " + documentInfoDto.toJson().toString());
-    return documentInfoDto;
+    DocsFullInfoDto docsFullInfoDto = DocsFullInfoDto.fromJson(data);
+    print("[listSegment->RES] " + docsFullInfoDto.toJson().toString());
+    return docsFullInfoDto;
   } catch (e) {
     print(e);
   }

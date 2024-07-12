@@ -3,6 +3,7 @@
 .dart_tool/
 .idea/
 .log/
+build/
 
 pubspec.lock
 lite_embeddings_dart_server.iml
