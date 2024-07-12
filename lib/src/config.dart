@@ -36,7 +36,7 @@ class Server {
   late int port;
 
   Server(
-      {this.ip = "127.0.0.1", this.apiPathPrefix = "/api", this.port = 9528});
+      {this.ip = "127.0.0.1", this.apiPathPrefix = "/api", this.port = 9537});
 
   factory Server.fromJson(Map<String, dynamic> json) => _$ServerFromJson(json);
 }
