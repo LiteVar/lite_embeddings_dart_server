@@ -30,9 +30,10 @@ class EmbeddingsController {
     try {
       LLMConfigDto llmConfigDto = LLMConfigDto.fromJson(data);
       String vdbType = config.vdb.type;
+      String vdbBaseUrl = config.vdb.baseUrl;
       VectorDatabase vectorDatabase;
       if (vdbType.toLowerCase() == VDBType.CHROMA) {
-        vectorDatabase = Chroma(OpenAIEmbeddingFunction(llmConfig: llmConfigDto.toModel()));
+        vectorDatabase = Chroma(OpenAIEmbeddingFunction(llmConfig: llmConfigDto.toModel()), baseUrl: vdbBaseUrl);
         embeddingsService = EmbeddingsService(vectorDatabase);
 
         logger.log(LogModule.http, "Response init", detail: jsonEncode({
