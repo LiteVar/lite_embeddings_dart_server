@@ -7,7 +7,7 @@ import 'package:lite_embeddings_dart/lite_embeddings.dart';
 import 'package:lite_embeddings_dart_server/src/config.dart';
 import 'package:lite_embeddings_dart_server/src/dto.dart';
 
-String prompt = "Get some tool status.";
+String prompt = "Who is author?";
 
 final String embeddingsModel = "text-embedding-ada-002";
 
