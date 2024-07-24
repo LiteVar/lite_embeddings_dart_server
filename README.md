@@ -32,21 +32,21 @@ LLM Embedding tool HTTP service
 
 #### 3.1 HTTP API
 - Docs CRUD API, include: 
-  - `/version`: get version number, to confirm server running
-  - `/init`: post the llm config to initial the embeddings service
-  - `/docs/create-by-text`: Create docs embeddings, post whole text and separator, service will split and write to vector database
-  - `/docs/create`: Create docs embeddings, post the split docs, service will write to vector database
-  - `/docs/delete`: Delete docs, post docsId
-  - `/docs/list`: List all docs, return docsId and docsName Array
-  - `/docs/rename`: Rename docsName
-  - `/docs/query`: Text query, return N segment array with distance sort
-  - `/docs/batch-query`: Text array query, query multi text at once, return N segment array in array
-  - `/docs/multi-query`: Docs array query, query multi docs with one text, return N segment with docsId array
-  - `/segment/list`: List all segments in the docs
-  - `/segment/insert`: Insert segment by index. If not index, new segment will be inserted at last
-  - `/segment/update`: Update segment
-  - `/segment/delete`: Delete segment
-  - `/dispose`: Dispose vector database connection
+  - [/version](#get-version): get version number, to confirm server running
+  - [/init](#post-init): post the llm config to initial the embeddings service
+  - [/docs/create-by-text](#post-docscreate-by-text): Create docs embeddings, post whole text and separator, service will split and write to vector database
+  - [/docs/create](#post-docscreate): Create docs embeddings, post the split docs, service will write to vector database
+  - [/docs/delete](#post-docsdelete): Delete docs, post docsId
+  - [/docs/list](#get-docslist): List all docs, return docsId and docsName Array
+  - [/docs/rename](#post-docsrename): Rename docsName
+  - [/docs/query](#post-docsquery): Text query, return N segment array with distance sort
+  - [/docs/batch-query](#post-docsbatch-query): Text array query, query multi text at once, return N segment array in array
+  - [/docs/multi-query](#post-docsmulti-query): Docs array query, query multi docs with one text, return N segment with docsId array
+  - [/segment/list](#post-segmentlist): List all segments in the docs
+  - [/segment/insert](#post-segmentinsert): Insert segment by index. If not index, new segment will be inserted at last
+  - [/segment/update](#post-segmentupdate): Update segment
+  - [/segment/delete](#post-segmentdelete): Delete segment
+  - [/dispose](#post-dispose): Dispose vector database connection
 
 ##### BaseURL
 - `http://127.0.0.1:9537/api`

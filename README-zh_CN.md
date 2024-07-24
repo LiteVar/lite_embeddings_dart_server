@@ -32,21 +32,21 @@
 
 #### 3.1 HTTP命令
 - 用于控制文档的增删改查，包括：
-  - `/version`：版本号，用于确认server在运行
-  - `/init`：初始化嵌入服务，传入大模型相关设置
-  - `/docs/create-by-text`：创建文档，传入完整文本和分隔符，服务自动分割，写入向量数据库
-  - `/docs/create`：创建文档，传入手工分割并结构化后的数据，写入向量数据库
-  - `/docs/delete`：删除文档，传入文档的id
-  - `/docs/list`：罗列出向量数据库所有现存的文档，包括文档的id和文件名
-  - `/docs/rename`：重命名文档的文件名
-  - `/docs/query`：检索查询，返回匹配后的片段数组
-  - `/docs/batch-query`：单一文档批量检索查询，可以一次性输入多个查询语句，返回多个语句分别匹配后的片段数组
-  - `/docs/multi-query`: 多文档单一查询语句，返回匹配后不同文档下的片段数组
-  - `/segment/list`：返回文档对应的所有片段
-  - `/segment/insert`：按位置插入新的片段，如果没有位置信息，默认排到最后
-  - `/segment/update`：更新片段
-  - `/segment/delete`：删除片段
-  - `/dispose`：断开向量数据库的连接
+  - [/version](#get-version)：版本号，用于确认server在运行
+  - [/init](#post-init)：初始化嵌入服务，传入大模型相关设置
+  - [/docs/create-by-text](#post-docscreate-by-text)：创建文档，传入完整文本和分隔符，服务自动分割，写入向量数据库
+  - [/docs/create](#post-docscreate)：创建文档，传入手工分割并结构化后的数据，写入向量数据库
+  - [/docs/delete](#post-docsdelete)：删除文档，传入文档的id
+  - [/docs/list](#get-docslist)：罗列出向量数据库所有现存的文档，包括文档的id和文件名
+  - [/docs/rename](#post-docsrename)：重命名文档的文件名
+  - [/docs/query](#post-docsquery)：检索查询，返回匹配后的片段数组
+  - [/docs/batch-query](#post-docsbatch-query)：单一文档批量检索查询，可以一次性输入多个查询语句，返回多个语句分别匹配后的片段数组
+  - [/docs/multi-query](#post-docsmulti-query)：多文档单一查询语句，返回匹配后不同文档下的片段数组
+  - [/segment/list](#post-segmentlist)：返回文档对应的所有片段
+  - [/segment/insert](#post-segmentinsert)：按位置插入新的片段，如果没有位置信息，默认排到最后
+  - [/segment/update](#post-segmentupdate)：更新片段
+  - [/segment/delete](#post-segmentdelete)：删除片段
+  - [/dispose](#post-dispose)：断开向量数据库的连接
 
 ##### BaseURL
 - `http://127.0.0.1:9537/api`
