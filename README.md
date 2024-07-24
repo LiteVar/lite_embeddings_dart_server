@@ -27,7 +27,7 @@ LLM Embedding tool HTTP service
 ### 2. Develop run server
 1. `debug` or `run` mode run `/bin/server.dart` file `main()`
 
-### 3. HTTP/WS API
+### 3. HTTP API
 - [HTTP API](#31-http-API)
 
 #### 3.1 HTTP API
@@ -40,7 +40,8 @@ LLM Embedding tool HTTP service
   - `/docs/list`: List all docs, return docsId and docsName Array
   - `/docs/rename`: Rename docsName
   - `/docs/query`: Text query, return N segment array with distance sort
-  - `/docs/batch-query`: Test array query, query multi text at once, return N segment array in array
+  - `/docs/batch-query`: Text array query, query multi text at once, return N segment array in array
+  - `/docs/multi-query`: Docs array query, query multi docs with one text, return N segment with docsId array
   - `/segment/list`: List all segments in the docs
   - `/segment/insert`: Insert segment by index. If not index, new segment will be inserted at last
   - `/segment/update`: Update segment
@@ -228,7 +229,7 @@ LLM Embedding tool HTTP service
 
 ##### [POST] /docs/batch-query
 
-- Feature: Test array query, query multi text at once, return N segment array in array
+- Feature: Text array query, query multi text at once, return N segment array in array
 - Request params: 
   - docsId, queryText array, return query result count
   - Sample
@@ -257,6 +258,36 @@ LLM Embedding tool HTTP service
           "distance": "<0.x float, segment match distance, smaller means closer>"
         }
       ]
+    }
+  ]
+  ```
+
+- `/docs/multi-query`: 
+
+##### [POST] /docs/multi-query
+
+- Feature: Docs array query, query multi docs with one text, return N segment with docsId array
+- Request params:
+  - docsId array, queryText, return query result count
+  - Sample
+  ```json
+  {
+    "docsIdList": ["xxxxxxxx", "yyyyyyyy"],
+    "queryText": "<Query Text 1>",
+    "nResults": "<UInt, return query result by sort number>"
+  }
+  ```
+- Response body:
+  - Query result: segment info array, include docsId, segmentId, segment text, metadata, distance
+  - Response body sample
+  ```json
+  [
+    {
+      "docsId": "xxxxxxxx",
+      "segmentId": "<Segment Id>",
+      "text": "<Segment text>",
+      "metadata": "<json map, segment with>",
+      "distance": "<0.x float, segment match distance, smaller means closer>"
     }
   ]
   ```
