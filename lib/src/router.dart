@@ -13,6 +13,7 @@ void apiRoutes() {
   apiRouter.post('/docs/rename', embeddingsController.renameDocs);
   apiRouter.post('/docs/query', embeddingsController.queryDocs);
   apiRouter.post('/docs/batch-query', embeddingsController.batchQueryDocs);
+  apiRouter.post('/docs/multi-query', embeddingsController.multiDocsQuery);
   apiRouter.post('/segment/list', embeddingsController.listSegment);
   apiRouter.post('/segment/insert', embeddingsController.insertSegment);
   apiRouter.post('/segment/update', embeddingsController.updateSegment);

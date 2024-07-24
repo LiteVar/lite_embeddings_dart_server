@@ -204,6 +204,27 @@ class EmbeddingsController {
     }
   }
 
+  Future<Response> multiDocsQuery(Request request) async {
+    final payload = await request.readAsString();
+    final data = jsonDecode(payload);
+
+    try {
+      final MultiDocsQueryRequestDto multiDocsQueryRequestDto = MultiDocsQueryRequestDto.fromJson(data);
+      logger.log(LogModule.http, "Request multiDocsQuery", detail: payload, level: Level.FINEST);
+
+      List<MultiDocsQueryResultDto> multiDocsQueryResultDtoList = await embeddingsService.multiDocsQuery(multiDocsQueryRequestDto);
+
+      logger.log(LogModule.http, "Response multiDocsQuery", detail: jsonEncode(multiDocsQueryResultDtoList));
+      return Response.ok(jsonEncode(multiDocsQueryResultDtoList));
+    } on FormatException catch (e) {
+      logger.log(LogModule.http, "Response multiDocsQuery FormatException: ${e}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: e);
+    } catch (e) {
+      logger.log(LogModule.http, "Response multiDocsQuery Exception: ${e}", detail: payload, level: Level.WARNING);
+      return Response.internalServerError(body: e);
+    }
+  }
+
   Future<Response> listSegment(Request request) async {
     final payload = await request.readAsString();
     final data = jsonDecode(payload);
