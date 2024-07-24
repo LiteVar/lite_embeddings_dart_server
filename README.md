@@ -274,7 +274,8 @@ LLM Embedding tool HTTP service
   {
     "docsIdList": ["xxxxxxxx", "yyyyyyyy"],
     "queryText": "<Query Text 1>",
-    "nResults": "<UInt, return query result by sort number>"
+    "nResults": "<UInt, return query result by sort number>",
+    "removeDuplicates": "<(Optional)boolean, default:true, return segments will be removed if same text>"
   }
   ```
 - Response body:

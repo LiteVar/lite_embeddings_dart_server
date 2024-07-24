@@ -272,7 +272,8 @@
   {
     "docsIdList": ["xxxxxxxx", "yyyyyyyy"],
     "queryText": "<查询文字1>",
-    "nResults": "<正整数，每一个查询文字都返回的数量，按匹配度从高到低排>"
+    "nResults": "<正整数，每一个查询文字都返回的数量，按匹配度从高到低排>",
+    "removeDuplicates": "<（可选）布尔值，默认：true，去除返回的片段列表中，文本部分相同的片段>"
   }
   ```
 - 返回：
