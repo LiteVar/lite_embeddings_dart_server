@@ -16,7 +16,7 @@ Config _$ConfigFromJson(Map<String, dynamic> json) => Config(
 Server _$ServerFromJson(Map<String, dynamic> json) => Server(
       ip: json['ip'] as String? ?? "127.0.0.1",
       apiPathPrefix: json['apiPathPrefix'] as String? ?? "/api",
-      port: (json['port'] as num?)?.toInt() ?? 9528,
+      port: (json['port'] as num?)?.toInt() ?? 9537,
     );
 
 VDB _$VDBFromJson(Map<String, dynamic> json) => VDB(
