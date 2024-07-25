@@ -11,7 +11,7 @@ dependencies:
   shelf: ^1.4.0
   shelf_router: ^1.1.0
   json_annotation: ^4.9.0
-  lite_embeddings_dart: ^0.1.0
+  lite_embeddings_dart: ^0.2.0
   logging: ^1.2.0
 
 dev_dependencies:
