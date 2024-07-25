@@ -52,11 +52,14 @@ class EmbeddingsController {
       } else {
         return Response.internalServerError(body: "Not Support Vector Database");
       }
-    } on FormatException catch (e) {
-      logger.log(LogModule.http, "Response createDocsByText FormatException: ${e}", detail: payload, level: Level.WARNING);
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response init VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
+      logger.log(LogModule.http, "Response init FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
-      logger.log(LogModule.http, "Response createDocsByText Exception: ${e}", detail: payload, level: Level.WARNING);
+      logger.log(LogModule.http, "Response init Exception: ${e}", detail: payload, level: Level.WARNING);
       return Response.internalServerError(body: e);
     }
   }
@@ -73,7 +76,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response createDocsByText", detail: jsonEncode(docsInfoDto.toJson()));
       return Response.ok(jsonEncode(docsInfoDto.toJson()));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response createDocsByText VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response createDocsByText FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -94,7 +100,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response createDocs", detail: jsonEncode(docsInfoDto.toJson()));
       return Response.ok(jsonEncode(docsInfoDto.toJson()));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response createDocs VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response createDocs FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -115,7 +124,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response deleteDocs", detail: jsonEncode(docsIdDto.toJson()));
       return Response.ok(jsonEncode(docsIdDto.toJson()));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response deleteDocs VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response deleteDocs FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -132,7 +144,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response listDocs", detail: jsonEncode(docsInfoDtoList));
       return Response.ok(jsonEncode(docsInfoDtoList));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response listDocs VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: "", level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response listDocs FormatException: ${e}", detail: "", level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -153,7 +168,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response renameDocs", detail: jsonEncode(docsInfoDto.toJson()));
       return Response.ok(jsonEncode(docsInfoDto.toJson()));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response renameDocs VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response renameDocs FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -174,7 +192,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response queryDocs", detail: jsonEncode(queryResultDto.toJson()));
       return Response.ok(jsonEncode(queryResultDto.toJson()));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response queryDocs VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response queryDocs FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -195,7 +216,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response batchQueryDocs", detail: jsonEncode(queryResultDtoList));
       return Response.ok(jsonEncode(queryResultDtoList));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response batchQueryDocs VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response batchQueryDocs FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -216,6 +240,9 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response multiDocsQuery", detail: jsonEncode(multiDocsQueryResultDtoList));
       return Response.ok(jsonEncode(multiDocsQueryResultDtoList));
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response multiDocsQuery VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
     } on FormatException catch (e) {
       logger.log(LogModule.http, "Response multiDocsQuery FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
@@ -237,7 +264,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response listSegment", detail: jsonEncode(docsFullInfoDto?.toJson()));
       return Response.ok(jsonEncode(docsFullInfoDto?.toJson()));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response listSegment VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response listSegment FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -258,7 +288,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response insertSegment", detail: jsonEncode(segmentIdDto.toJson()));
       return Response.ok(jsonEncode(segmentIdDto.toJson()));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response insertSegment VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response insertSegment FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -279,7 +312,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response updateSegment", detail: jsonEncode(segmentIdDto.toJson()));
       return Response.ok(jsonEncode(segmentIdDto.toJson()));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response updateSegment VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response updateSegment FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -300,7 +336,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response deleteSegment", detail: jsonEncode(segmentIdDto.toJson()));
       return Response.ok(jsonEncode(segmentIdDto.toJson()));
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response deleteSegment VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response deleteSegment FormatException: ${e}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
@@ -315,7 +354,10 @@ class EmbeddingsController {
 
       logger.log(LogModule.http, "Response dispose", detail: "Dispose successfully.");
       return Response.ok("Dispose successfully.");
-    } on FormatException catch (e) {
+    } on VectorDatabaseException catch (e) {
+      logger.log(LogModule.http, "Response dispose VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: "", level: Level.WARNING);
+      return Response.badRequest(body: jsonEncode(e.toJson()));
+    }  on FormatException catch (e) {
       logger.log(LogModule.http, "Response dispose FormatException: ${e}", detail: "", level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
