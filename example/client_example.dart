@@ -20,7 +20,9 @@ Dio dio = Dio(BaseOptions(
 ));
 
 Future<void> main() async {
-  init(_buildLLMConfigDto());
+  init();
+
+  LLMConfigDto llmConfigDto = _buildLLMConfigDto();
 
   String fileName = "Moore's Law for Everything.md";
   String fileText = await _buildDocsText(fileName);
@@ -33,9 +35,9 @@ Future<void> main() async {
   print("docsNameDtoList: ${jsonEncode(docsInfoDtoList)}");
 
   /// Create New Docs
-  // CreateDocsTextDto createDocsTextDto = CreateDocsTextDto(docsName: fileName, text: fileText, separator: separator, metadata: {"vdb": "chroma", "embeddings_model": embeddingsModel});
-  // DocsInfoDto? docsInfoDto = await createDocsByText(createDocsTextDto);
-  // print("docsInfoDto: ${docsInfoDto?.toJson()}");
+  CreateDocsTextRequestDto createDocsTextRequestDto = CreateDocsTextRequestDto(docsName: fileName, text: fileText, separator: separator, llmConfig: llmConfigDto, metadata: {"vdb": "chroma", "embeddings_model": embeddingsModel});
+  DocsInfoDto? docsInfoDto = await createDocsByText(createDocsTextRequestDto);
+  print("docsInfoDto: ${docsInfoDto?.toJson()}");
 
   /// List Segments
   // String docsId = "<FROM DocsInfoDto>";
@@ -45,18 +47,25 @@ Future<void> main() async {
 
   /// Query
   // String questText = "Who is author?";
-  // QueryDto queryDto = QueryDto(docsId: docsId, queryText: questText, nResults: 3);
-  // QueryResultDto? queryResultDto = await queryDocs(queryDto);
+  // QueryRequestDto queryRequestDto = QueryRequestDto(docsId: docsId, queryText: questText, llmConfig: llmConfigDto, nResults: 3);
+  // QueryResultDto? queryResultDto = await queryDocs(queryRequestDto);
   // print("queryResultDto: ${jsonEncode(queryResultDto)}");
+
+  /// MultiQuery: Multi Docs query
+  // String queryText = "Who is author?";
+  // List<String> docsIdList = ["xxx", "yyy", "zzz"];
+  // MultiDocsQueryRequestDto multiDocsQueryRequestDto = MultiDocsQueryRequestDto(docsIdList: docsIdList, queryText: queryText, llmConfig: llmConfigDto);
+  // MultiDocsQueryResultDto? multiDocsQueryResultDto = await multiDocsQuery(multiDocsQueryRequestDto);
+  // print("multiDocsQueryResultDto: ${jsonEncode(multiDocsQueryResultDto?.toJson())}");
 
   /// Update Segment
   // SegmentInfoDto segmentInfoDto = SegmentInfoDto(id: segmentId, text: newText, metadata: metadata);
-  // UpdateSegmentDto updateSegmentDto = UpdateSegmentDto(docsId: docsId, segment: segmentInfoDto);
+  // UpdateSegmentDto updateSegmentDto = UpdateSegmentDto(docsId: docsId, segment: segmentInfoDto, llmConfig: llmConfigDto);
   // await updateSegment(updateSegmentDto);
 
   /// Insert Segment
   // SegmentDto segmentDto = SegmentDto(text: newText, metadata: metadata);
-  // InsertSegmentDto insertSegmentDto = InsertSegmentDto(docsId: docsId, segment: segmentDto, index: 2);
+  // InsertSegmentDto insertSegmentDto = InsertSegmentDto(docsId: docsId, segment: segmentDto, llmConfig: llmConfigDto, index: 2);
   // await insertSegment(insertSegmentDto);
 
   /// Delete Segment
@@ -109,9 +118,9 @@ Future<VersionDto?> getVersion() async {
   return null;
 }
 
-Future<void> init(LLMConfigDto llmConfigDto) async {
+Future<void> init() async {
   try {
-    Response response = await dio.post('/init', data: llmConfigDto.toJson());
+    Response response = await dio.post('/init');
     final payload = response.data as String;
     print("[init->RES] " + payload);
   } catch (e) {
@@ -119,28 +128,28 @@ Future<void> init(LLMConfigDto llmConfigDto) async {
   }
 }
 
-Future<DocsInfoDto?> createDocsByText(CreateDocsTextDto createDocsTextDto) async {
+Future<CreateDocsResultDto?> createDocsByText(CreateDocsTextRequestDto createDocsTextRequestDto) async {
   try {
-    Response response = await dio.post('/docs/create-by-text', data: createDocsTextDto.toJson());
+    Response response = await dio.post('/docs/create-by-text', data: createDocsTextRequestDto.toJson());
     final payload = response.data as String;
     final data = jsonDecode(payload);
-    DocsInfoDto docsInfoDto = DocsInfoDto.fromJson(data);
-    print("[createDocsByText->RES] " + docsInfoDto.toJson().toString());
-    return docsInfoDto;
+    CreateDocsResultDto createDocsResultDto = CreateDocsResultDto.fromJson(data);
+    print("[createDocsByText->RES] " + createDocsResultDto.toJson().toString());
+    return createDocsResultDto;
   } catch (e) {
     print(e);
   }
   return null;
 }
 
-Future<DocsInfoDto?> createDocs(DocsDto docsDto) async {
+Future<CreateDocsResultDto?> createDocs(CreateDocsRequestDto createDocsRequestDto) async {
   try {
-    Response response = await dio.post('/docs/create', data: docsDto.toJson());
+    Response response = await dio.post('/docs/create', data: createDocsRequestDto.toJson());
     final payload = response.data as String;
     final data = jsonDecode(payload);
-    DocsInfoDto docsInfoDto = DocsInfoDto.fromJson(data);
-    print("[createDocs->RES] " + docsInfoDto.toJson().toString());
-    return docsInfoDto;
+    CreateDocsResultDto createDocsResultDto = CreateDocsResultDto.fromJson(data);
+    print("[createDocs->RES] " + createDocsResultDto.toJson().toString());
+    return createDocsResultDto;
   } catch (e) {
     print(e);
   }
@@ -189,9 +198,9 @@ Future<DocsInfoDto?> renameDocs(DocsInfoDto docsInfoDto) async {
   return null;
 }
 
-Future<QueryResultDto?> queryDocs(QueryDto queryDto) async {
+Future<QueryResultDto?> queryDocs(QueryRequestDto queryRequestDto) async {
   try {
-    Response response = await dio.post('/docs/query', data: queryDto.toJson());
+    Response response = await dio.post('/docs/query', data: queryRequestDto.toJson());
     final payload = response.data as String;
     final data = jsonDecode(payload);
     QueryResultDto queryResultDto = QueryResultDto.fromJson(data);
@@ -203,14 +212,28 @@ Future<QueryResultDto?> queryDocs(QueryDto queryDto) async {
   return null;
 }
 
-Future<List<QueryResultDto>?> batchQueryDocs(BatchQueryDto batchQueryDto) async {
+Future<List<QueryResultDto>?> batchQueryDocs(BatchQueryRequestDto batchQueryRequestDto) async {
   try {
-    Response response = await dio.post('/docs/batch-query', data: batchQueryDto.toJson());
+    Response response = await dio.post('/docs/batch-query', data: batchQueryRequestDto.toJson());
     final payload = response.data as String;
     final data = jsonDecode(payload) as List<dynamic>;
     List<QueryResultDto> queryResultDtoList = data.map((queryResultDtoJson) => QueryResultDto.fromJson(queryResultDtoJson)).toList();
     print("[batchQueryDocs->RES] " + jsonEncode(queryResultDtoList));
     return queryResultDtoList;
+  } catch (e) {
+    print(e);
+  }
+  return null;
+}
+
+Future<MultiDocsQueryResultDto?> multiDocsQuery(MultiDocsQueryRequestDto multiDocsQueryRequestDto) async {
+  try {
+    Response response = await dio.post('/docs/multi-query', data: multiDocsQueryRequestDto.toJson());
+    final payload = response.data as String;
+    final data = jsonDecode(payload);
+    MultiDocsQueryResultDto multiDocsQueryResultDto = MultiDocsQueryResultDto.fromJson(data);
+    print("[batchQueryDocs->RES] " + jsonEncode(multiDocsQueryResultDto.toJson()));
+    return multiDocsQueryResultDto;
   } catch (e) {
     print(e);
   }
@@ -232,28 +255,28 @@ Future<DocsFullInfoDto?> listSegments(DocsIdDto docsIdDto) async {
   return null;
 }
 
-Future<SegmentIdDto?> insertSegment(InsertSegmentDto insertSegmentDto) async {
+Future<SegmentUpsertResultDto?> insertSegment(InsertSegmentDto insertSegmentDto) async {
   try {
     Response response = await dio.post('/segment/insert', data: insertSegmentDto.toJson());
     final payload = response.data as String;
     final data = jsonDecode(payload);
-    SegmentIdDto segmentIdDto = SegmentIdDto.fromJson(data);
-    print("[insertSegment->RES] " + segmentIdDto.toJson().toString());
-    return segmentIdDto;
+    SegmentUpsertResultDto segmentUpsertResultDto = SegmentUpsertResultDto.fromJson(data);
+    print("[insertSegment->RES] " + segmentUpsertResultDto.toJson().toString());
+    return segmentUpsertResultDto;
   } catch (e) {
     print(e);
   }
   return null;
 }
 
-Future<SegmentIdDto?> updateSegment(UpdateSegmentDto updateSegmentDto) async {
+Future<SegmentUpsertResultDto?> updateSegment(UpdateSegmentDto updateSegmentDto) async {
   try {
     Response response = await dio.post('/segment/update', data: updateSegmentDto.toJson());
     final payload = response.data as String;
     final data = jsonDecode(payload);
-    SegmentIdDto segmentIdDto = SegmentIdDto.fromJson(data);
-    print("[updateSegment->RES] " + segmentIdDto.toJson().toString());
-    return segmentIdDto;
+    SegmentUpsertResultDto segmentUpsertResultDto = SegmentUpsertResultDto.fromJson(data);
+    print("[updateSegment->RES] " + segmentUpsertResultDto.toJson().toString());
+    return segmentUpsertResultDto;
   } catch (e) {
     print(e);
   }

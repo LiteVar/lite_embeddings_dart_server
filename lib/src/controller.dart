@@ -24,42 +24,35 @@ class EmbeddingsController {
   }
 
   Future<Response> init(Request request) async {
-    final payload = await request.readAsString();
-    final data = jsonDecode(payload);
 
     try {
-      LLMConfigDto llmConfigDto = LLMConfigDto.fromJson(data);
       String vdbType = config.vdb.type;
       String vdbBaseUrl = config.vdb.baseUrl;
       VectorDatabase vectorDatabase;
       if (vdbType.toLowerCase() == VDBType.CHROMA) {
-        vectorDatabase = Chroma(OpenAIEmbeddingFunction(llmConfig: llmConfigDto.toModel()), baseUrl: vdbBaseUrl);
+        vectorDatabase = Chroma(baseUrl: vdbBaseUrl);
         embeddingsService = EmbeddingsService(vectorDatabase);
 
         logger.log(LogModule.http, "Response init", detail: jsonEncode({
-          "vectorDatabase": vdbType.toLowerCase(),
-          "baseUrl": llmConfigDto.baseUrl,
-          "embeddingsModel": llmConfigDto.model,
+          "vectorDatabase": vdbType.toLowerCase()
         }));
 
         embeddingsService.init();
 
         return Response.ok(jsonEncode({
-          "vectorDatabase": vdbType.toLowerCase(),
-          "baseUrl": llmConfigDto.baseUrl,
-          "embeddingsModel": llmConfigDto.model,
+          "vectorDatabase": vdbType.toLowerCase()
         }));
       } else {
         return Response.internalServerError(body: "Not Support Vector Database");
       }
     } on VectorDatabaseException catch (e) {
-      logger.log(LogModule.http, "Response init VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
+      logger.log(LogModule.http, "Response init VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: "", level: Level.WARNING);
       return Response.badRequest(body: jsonEncode(e.toJson()));
     }  on FormatException catch (e) {
-      logger.log(LogModule.http, "Response init FormatException: ${e}", detail: payload, level: Level.WARNING);
+      logger.log(LogModule.http, "Response init FormatException: ${e}", detail: "", level: Level.WARNING);
       return Response.badRequest(body: e);
     } catch (e) {
-      logger.log(LogModule.http, "Response init Exception: ${e}", detail: payload, level: Level.WARNING);
+      logger.log(LogModule.http, "Response init Exception: ${e}", detail: "", level: Level.WARNING);
       return Response.internalServerError(body: e);
     }
   }
@@ -69,13 +62,13 @@ class EmbeddingsController {
     final data = jsonDecode(payload);
 
     try {
-      final CreateDocsTextDto createDocsTextDto = CreateDocsTextDto.fromJson(data);
+      final CreateDocsTextRequestDto createDocsTextRequestDto = CreateDocsTextRequestDto.fromJson(data);
       logger.log(LogModule.http, "Request createDocsByText", detail: payload, level: Level.FINEST);
 
-      DocsInfoDto docsInfoDto = await embeddingsService.createDocsByText(createDocsTextDto);
+      CreateDocsResultDto createDocsResultDto = await embeddingsService.createDocsByText(createDocsTextRequestDto);
 
-      logger.log(LogModule.http, "Response createDocsByText", detail: jsonEncode(docsInfoDto.toJson()));
-      return Response.ok(jsonEncode(docsInfoDto.toJson()));
+      logger.log(LogModule.http, "Response createDocsByText", detail: jsonEncode(createDocsResultDto.toJson()));
+      return Response.ok(jsonEncode(createDocsResultDto.toJson()));
     } on VectorDatabaseException catch (e) {
       logger.log(LogModule.http, "Response createDocsByText VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: jsonEncode(e.toJson()));
@@ -93,13 +86,13 @@ class EmbeddingsController {
     final data = jsonDecode(payload);
 
     try {
-      final DocsDto documentDto = DocsDto.fromJson(data);
+      final CreateDocsRequestDto createDocsRequestDto = CreateDocsRequestDto.fromJson(data);
       logger.log(LogModule.http, "Request createDocs", detail: payload, level: Level.FINEST);
 
-      DocsInfoDto docsInfoDto = await embeddingsService.createDocs(documentDto);
+      CreateDocsResultDto createDocsResultDto = await embeddingsService.createDocs(createDocsRequestDto);
 
-      logger.log(LogModule.http, "Response createDocs", detail: jsonEncode(docsInfoDto.toJson()));
-      return Response.ok(jsonEncode(docsInfoDto.toJson()));
+      logger.log(LogModule.http, "Response createDocs", detail: jsonEncode(createDocsResultDto.toJson()));
+      return Response.ok(jsonEncode(createDocsResultDto.toJson()));
     } on VectorDatabaseException catch (e) {
       logger.log(LogModule.http, "Response createDocs VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: jsonEncode(e.toJson()));
@@ -185,10 +178,10 @@ class EmbeddingsController {
     final data = jsonDecode(payload);
 
     try {
-      final QueryDto queryDto = QueryDto.fromJson(data);
+      final QueryRequestDto queryRequestDto = QueryRequestDto.fromJson(data);
       logger.log(LogModule.http, "Request queryDocs", detail: payload, level: Level.FINEST);
 
-      QueryResultDto queryResultDto = await embeddingsService.query(queryDto);
+      QueryResultDto queryResultDto = await embeddingsService.query(queryRequestDto);
 
       logger.log(LogModule.http, "Response queryDocs", detail: jsonEncode(queryResultDto.toJson()));
       return Response.ok(jsonEncode(queryResultDto.toJson()));
@@ -209,10 +202,10 @@ class EmbeddingsController {
     final data = jsonDecode(payload);
 
     try {
-      final BatchQueryDto batchQueryDto = BatchQueryDto.fromJson(data);
+      final BatchQueryRequestDto batchQueryRequestDto = BatchQueryRequestDto.fromJson(data);
       logger.log(LogModule.http, "Request batchQueryDocs", detail: payload, level: Level.FINEST);
 
-      List<QueryResultDto> queryResultDtoList = await embeddingsService.batchQuery(batchQueryDto);
+      List<QueryResultDto> queryResultDtoList = await embeddingsService.batchQuery(batchQueryRequestDto);
 
       logger.log(LogModule.http, "Response batchQueryDocs", detail: jsonEncode(queryResultDtoList));
       return Response.ok(jsonEncode(queryResultDtoList));
@@ -236,10 +229,10 @@ class EmbeddingsController {
       final MultiDocsQueryRequestDto multiDocsQueryRequestDto = MultiDocsQueryRequestDto.fromJson(data);
       logger.log(LogModule.http, "Request multiDocsQuery", detail: payload, level: Level.FINEST);
 
-      List<MultiDocsQueryResultDto> multiDocsQueryResultDtoList = await embeddingsService.multiDocsQuery(multiDocsQueryRequestDto);
+      MultiDocsQueryResultDto multiDocsQueryResultDto = await embeddingsService.multiDocsQuery(multiDocsQueryRequestDto);
 
-      logger.log(LogModule.http, "Response multiDocsQuery", detail: jsonEncode(multiDocsQueryResultDtoList));
-      return Response.ok(jsonEncode(multiDocsQueryResultDtoList));
+      logger.log(LogModule.http, "Response multiDocsQuery", detail: jsonEncode(multiDocsQueryResultDto.toJson()));
+      return Response.ok(jsonEncode(multiDocsQueryResultDto.toJson()));
     } on VectorDatabaseException catch (e) {
       logger.log(LogModule.http, "Response multiDocsQuery VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: jsonEncode(e.toJson()));
@@ -284,10 +277,10 @@ class EmbeddingsController {
       final InsertSegmentDto insertSegmentDto = InsertSegmentDto.fromJson(data);
       logger.log(LogModule.http, "Request insertSegment", detail: payload, level: Level.FINEST);
 
-      SegmentIdDto segmentIdDto = await embeddingsService.insertSegment(insertSegmentDto);
+      SegmentUpsertResultDto segmentUpsertResultDto = await embeddingsService.insertSegment(insertSegmentDto);
 
-      logger.log(LogModule.http, "Response insertSegment", detail: jsonEncode(segmentIdDto.toJson()));
-      return Response.ok(jsonEncode(segmentIdDto.toJson()));
+      logger.log(LogModule.http, "Response insertSegment", detail: jsonEncode(segmentUpsertResultDto.toJson()));
+      return Response.ok(jsonEncode(segmentUpsertResultDto.toJson()));
     } on VectorDatabaseException catch (e) {
       logger.log(LogModule.http, "Response insertSegment VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: payload, level: Level.WARNING);
       return Response.badRequest(body: jsonEncode(e.toJson()));

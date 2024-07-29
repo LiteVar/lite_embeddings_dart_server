@@ -66,25 +66,14 @@
 ##### [POST] /init
 
 - 功能：初始化嵌入服务，传入大模型相关设置
-- 请求参数：
-  - 大模型设置：大模型的链接、key、模型名称
-  - 请求样例
-  ```json
-  {
-    "baseUrl": "<大模型厂商的api入口，例如：https://api.openai.com/v1>",
-    "apiKey": "<大模型厂商的api的Key，例如：sk-xxxxxxxxxx>",
-    "model": "<厂商支持的嵌入大模型名称，例如：text-embedding-ada-002>"
-  }
-  ```
+- 请求参数：无
 
 - 返回：
-  - 初始化的信息，包括向量数据库名字，大模型API的baseURL，模型名称
+  - 初始化的信息，包括向量数据库名字
   - 返回样例
   ```json
     {
-      "vectorDatabase": "<向量数据库名字，例如：chroma>",
-      "baseUrl": "<大模型厂商的api入口，例如：https://api.openai.com/v1>",
-      "embeddingsModel": "<厂商支持的嵌入大模型名称，例如：text-embedding-ada-002>"
+      "vectorDatabase": "<向量数据库名字，例如：chroma>"
     }
   ```
 
@@ -92,23 +81,32 @@
 
 - 功能：创建文档，传入完整文本和分隔符，服务自动分割，写入向量数据库
 - 请求参数：
-  - 文档相关：文件名、全文、分隔符、元数据
+  - 文档相关：文件名、全文、分隔符、元数据、大模型配置
   - 请求样例
   ```json
   {
     "docsName": "<文档的名称，例如：摩尔定律使用于一切.md>",
     "text": "<文档的文本全文，带有分隔符>",
     "separator": "<分隔符的文本>",
-    "metadata": "<json map，结构体的值只支持数字、文本、布尔值，不支持对象和数组，每个片段都使用相同的metadata>"
+    "metadata": "<json map，结构体的值只支持数字、文本、布尔值，不支持对象和数组，每个片段都使用相同的metadata>",
+    "llmConfig": {
+      "baseUrl": "<大模型API的baseUrl，例如：https://api.openai.com/v1>>",
+      "apiKey": "<大模型API的apiKey，例如：sk-xxxxxxxxxx>",
+      "model": "<大模型API的嵌入模型名称，例如：text-embedding-ada-002>"
+    }
   }
   ```
 - 返回：
-  - 创建成功的文档信息，包括文档的Id，文件名
+  - 创建成功的文档信息，包括文档的Id、文件名、token消耗
   - 返回样例
   ```json
   {
     "docsId": "<文档对应的Id>",
-    "docsName": "<文档的文件名>"
+    "docsName": "<文档的文件名>",
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 
@@ -116,7 +114,7 @@
 
 - 功能：创建文档，传入手工分割并结构化后的数据，写入向量数据库
 - 请求参数：
-  - 文档相关：文件名、各个片段及其对应的元数据
+  - 文档相关：文件名、各个片段及其对应的元数据、大模型配置
   - 请求样例
   ```json
   {
@@ -126,16 +124,25 @@
         "text": "<片段的原文>",
         "metadata": "<json map，结构体的值只支持数字、文本、布尔值，不支持对象和数组>"
       }
-    ]
+    ],
+    "llmConfig": {
+      "baseUrl": "<大模型API的baseUrl，例如：https://api.openai.com/v1>>",
+      "apiKey": "<大模型API的apiKey，例如：sk-xxxxxxxxxx>",
+      "model": "<大模型API的嵌入模型名称，例如：text-embedding-ada-002>"
+    }
   }
   ```
 - 返回：
-  - 创建成功的文档信息，包括文档的Id，文件名
+  - 创建成功的文档信息，包括文档的Id、文件名、token消耗
   - 返回样例
   ```json
   {
     "docsId": "<文档对应的Id>",
-    "docsName": "<文档的文件名>"
+    "docsName": "<文档的文件名>",
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 
@@ -207,11 +214,16 @@
   {
     "docsId": "xxxxxxxx",
     "queryText": "<需要匹配的关键文字>",
-    "nResults": "<正整数，按匹配度从高到低排，返回匹配片段的数量>"
+    "nResults": "<（可选）正整数，默认为2，按距离从小到大，返回匹配片段的数量>",
+    "llmConfig": {
+      "baseUrl": "<大模型API的baseUrl，例如：https://api.openai.com/v1>>",
+      "apiKey": "<大模型API的apiKey，例如：sk-xxxxxxxxxx>",
+      "model": "<大模型API的嵌入模型名称，例如：text-embedding-ada-002>"
+    }
   }
   ```
 - 返回：
-  - 文档Id，片段信息的数组
+  - 文档Id、片段信息的数组、token消耗
   - 返回样例
   ```json
   {
@@ -223,7 +235,11 @@
         "metadata": "<json map，片段附带的metadata>",
         "distance": "<0.x的小数，片段匹配向量的距离，越小说明越相近>"
       }
-    ]
+    ],
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 
@@ -231,7 +247,7 @@
 
 - 功能：批量检索查询，可以一次性输入多个查询语句，返回多个语句分别匹配后的片段数组
 - 请求参数：
-  - 文档Id，查询关键文字的数组，返回结果数量
+  - 文档Id、查询关键文字的数组、返回结果数量、大模型配置
   - 请求样例
   ```json
   {
@@ -240,11 +256,16 @@
       "<查询文字1>",
       "<查询文字2>"
     ],
-    "nResults": "<正整数，每一个查询文字都返回的数量，按匹配度从高到低排>"
+    "nResults": "<（可选）正整数，默认为2，每一个查询文字都返回的数量，按匹配度从高到低排>",
+    "llmConfig": {
+      "baseUrl": "<大模型API的baseUrl，例如：https://api.openai.com/v1>>",
+      "apiKey": "<大模型API的apiKey，例如：sk-xxxxxxxxxx>",
+      "model": "<大模型API的嵌入模型名称，例如：text-embedding-ada-002>"
+    }
   }
   ```
 - 返回：
-  - 检索成功的结果，包括文档ID、片段结果数组组成对象的数组
+  - 检索成功的结果，包括文档ID、片段结果数组组成对象的数组、token消耗
   - 返回样例
   ```json
   [
@@ -257,7 +278,11 @@
           "metadata": "<json map，片段附带的metadata>",
           "distance": "<0.x的小数，片段匹配向量的距离，越小说明越相近>"
         }
-      ]
+      ],
+      "tokenUsage": {
+        "promptToken": "",
+        "totalToken": ""
+      }
     }
   ]
   ```
@@ -266,29 +291,40 @@
 
 - 功能：多文档单一查询语句，返回匹配后不同文档下的片段数组
 - 请求参数：
-  - 文档Id的数组，查询关键文字，返回结果数量
+  - 文档Id的数组、查询关键文字、返回结果数量、大模型配置
   - 请求样例
   ```json
   {
     "docsIdList": ["xxxxxxxx", "yyyyyyyy"],
     "queryText": "<查询文字1>",
-    "nResults": "<正整数，每一个查询文字都返回的数量，按匹配度从高到低排>",
-    "removeDuplicates": "<（可选）布尔值，默认：true，去除返回的片段列表中，文本部分相同的片段>"
+    "nResults": "<（可选）正整数，默认为2，每一个查询文字都返回的数量，按匹配度从高到低排>",
+    "removeDuplicates": "<（可选）布尔值，默认：true，去除返回的片段列表中，文本部分相同的片段>",
+    "llmConfig": {
+      "baseUrl": "<大模型API的baseUrl，例如：https://api.openai.com/v1>>",
+      "apiKey": "<大模型API的apiKey，例如：sk-xxxxxxxxxx>",
+      "model": "<大模型API的嵌入模型名称，例如：text-embedding-ada-002>"
+    }
   }
   ```
 - 返回：
-  - 检索成功的结果，片段信息的数组，数组每个对象包括文档ID、片段ID片段文字、metadata、distance
+  - 检索成功的结果，片段信息的数组，数组每个对象包括文档ID、片段ID片段文字、metadata、distance、token消耗
   - 返回样例
   ```json
-  [
-    {
-      "docsId": "xxxxxxxx",
-      "segmentId": "<片段Id>",
-      "text": "<片段文字>",
-      "metadata": "<json map，片段附带的metadata>",
-      "distance": "<0.x的小数，片段匹配向量的距离，越小说明越相近>"
+  {
+    "segmentResultList": [
+      {
+        "docsId": "xxxxxxxx",
+        "segmentId": "<片段Id>",
+        "text": "<片段文字>",
+        "metadata": "<json map，片段附带的metadata>",
+        "distance": "<0.x的小数，片段匹配向量的距离，越小说明越相近>"
+      }
+    ],
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
     }
-  ]
+  }
   ```
 
 ##### [POST] /segment/list
@@ -323,7 +359,7 @@
 
 - 功能：按位置插入新的片段，如果没有位置信息，默认排到最后
 - 请求参数：
-  - 文档Id、新的片段信息、插入位置
+  - 文档Id、新的片段信息、插入位置、大模型配置
   - 请求样例
   ```json
   {
@@ -332,15 +368,24 @@
       "text": "<片段文字>",
       "metadata": "<json map，片段附带的metadata>"
     },
-    "index": "（可选）正整数，如果为空，或者大于原长度，则默认添加到末尾"
+    "index": "（可选）正整数，如果为空，或者大于原长度，则默认添加到末尾",
+    "llmConfig": {
+      "baseUrl": "<大模型API的baseUrl，例如：https://api.openai.com/v1>>",
+      "apiKey": "<大模型API的apiKey，例如：sk-xxxxxxxxxx>",
+      "model": "<大模型API的嵌入模型名称，例如：text-embedding-ada-002>"
+    }
   }
   ```
 - 返回：
-  - 插入成功的片段，片段Id
+  - 插入成功的片段、片段Id、token消耗
   - 返回样例
   ```json
   {
-    "segmentId": "xxxxxxxx"
+    "segmentId": "xxxxxxxx",
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 
@@ -348,7 +393,7 @@
 
 - 功能：更新片段
 - 请求参数：
-  - 文档Id、新的片段信息
+  - 文档Id、新的片段信息、大模型配置
   - 请求样例
   ```json
   {
@@ -357,15 +402,24 @@
       "segmentId": "<片段Id>",
       "text": "<片段文字>",
       "metadata": "<json map，片段附带的metadata>"
+    },
+    "llmConfig": {
+      "baseUrl": "<大模型API的baseUrl，例如：https://api.openai.com/v1>>",
+      "apiKey": "<大模型API的apiKey，例如：sk-xxxxxxxxxx>",
+      "model": "<大模型API的嵌入模型名称，例如：text-embedding-ada-002>"
     }
   }
   ```
 - 返回：
-  - 片段Id
+  - 片段Id、token消耗
   - 返回样例
   ```json
   {
-    "segmentId": "xxxxxxxx"
+    "segmentId": "xxxxxxxx",
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 

@@ -66,49 +66,38 @@ LLM Embedding tool HTTP service
 ##### [POST] /init
 
 - Feature: post the llm config to initial the embeddings service
-- Request params: 
-  - LLM config: baseUrl, apiKey, model
-  - Sample: 
-  ```json
-  {
-    "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
-    "apiKey": "<LLM API apiKey, e.g. sk-xxxxxxxxxx>",
-    "model": "<LLM API embeddings model name, e.g. : text-embedding-ada-002>"
-  }
-  ```
-
-- Response body: 
-  - Echo init info, include vectorDatabase name, baseUrl, embeddingsModel
-  - Response body sample
-  ```json
-    {
-      "vectorDatabase": "<Vector Database name, e.g. : chroma>",
-      "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
-      "embeddingsModel": "<LLM API embeddings model name, e.g. : text-embedding-ada-002>"
-    }
-  ```
+- Request params: null
 
 ##### [POST] /docs/create-by-text
 
 - Feature: Create docs embeddings, post whole text and separator, service will split and write to vector database
 - Request params: 
-  - Docs info: docsName, text, separator, metadata
+  - Docs info: docsName, text, separator, metadata, LLM Config
   - Sample
   ```json
   {
     "docsName": "<Docs name, e.g. Moore's Law for Everything.md>",
     "text": "<Docs full text, with separetor>",
     "separator": "<Separator text>",
-    "metadata": "<json map, value only int, float, string, bool, NOT support object and array. Each segment with same metadata>"
+    "metadata": "<json map, value only int, float, string, bool, NOT support object and array. Each segment with same metadata>",
+    "llmConfig": {
+      "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
+      "apiKey": "<LLM API apiKey, e.g. sk-xxxxxxxxxx>",
+      "model": "<LLM API embeddings model name, e.g. text-embedding-ada-002>"
+    }
   }
   ```
 - Response body: 
-  - Create successful docs info: docsId, docsName
+  - Create successful docs info: docsId, docsName, Token Usage
   - Response body sample
   ```json
   {
     "docsId": "<Docs Id>",
-    "docsName": "<Docs Name>"
+    "docsName": "<Docs Name>",
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 
@@ -116,7 +105,7 @@ LLM Embedding tool HTTP service
 
 - Feature: Create docs embeddings, post the split docs, service will write to vector database
 - Request params: 
-  - Docs info: docsName, segment and metadata array 
+  - Docs info: docsName, segment and metadata array, LLM Config
   - Sample
   ```json
   {
@@ -126,16 +115,25 @@ LLM Embedding tool HTTP service
         "text": "<Segment text>",
         "metadata": "<json map, value only int, float, string, bool, NOT support object and array>"
       }
-    ]
+    ],
+    "llmConfig": {
+      "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
+      "apiKey": "<LLM API apiKey, e.g. sk-xxxxxxxxxx>",
+      "model": "<LLM API embeddings model name, e.g. text-embedding-ada-002>"
+    }
   }
   ```
 - Response body: 
-  - Create successful docs info: docsId, docsName
+  - Create successful docs info: docsId, docsName, Token Usage
   - Response body sample
   ```json
   {
     "docsId": "<Docs Id>",
-    "docsName": "<Docs Name>"
+    "docsName": "<Docs Name>",
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 
@@ -201,17 +199,22 @@ LLM Embedding tool HTTP service
 
 - Feature: Text query, return N segment array with distance sort
 - Request params: 
-  - docsId, queryText, return query result count
+  - docsId, queryText, return query result count, LLM Config
   - Sample
   ```json
   {
     "docsId": "xxxxxxxx",
     "queryText": "<query text string>",
-    "nResults": "<UInt, return query result by sort number>"
+    "nResults": "<UInt, return query result by sort number>",
+    "llmConfig": {
+      "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
+      "apiKey": "<LLM API apiKey, e.g. sk-xxxxxxxxxx>",
+      "model": "<LLM API embeddings model name, e.g. text-embedding-ada-002>"
+    }
   }
   ```
 - Response body: 
-  - docsId, segmentResultList
+  - docsId, segmentResultList, Token Usage
   - Response body sample
   ```json
   {
@@ -223,7 +226,11 @@ LLM Embedding tool HTTP service
         "metadata": "<json map, segment with>",
         "distance": "<0.x float, segment match distance, smaller means closer>"
       }
-    ]
+    ],
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 
@@ -231,7 +238,7 @@ LLM Embedding tool HTTP service
 
 - Feature: Text array query, query multi text at once, return N segment array in array
 - Request params: 
-  - docsId, queryText array, return query result count
+  - docsId, queryText array, return query result count, LLM Config
   - Sample
   ```json
   {
@@ -240,11 +247,16 @@ LLM Embedding tool HTTP service
       "<Query Text 1>",
       "<Query Text 2>"
     ],
-    "nResults": "<UInt, return query result by sort number>"
+    "nResults": "<UInt, return query result by sort number>",
+    "llmConfig": {
+      "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
+      "apiKey": "<LLM API apiKey, e.g. sk-xxxxxxxxxx>",
+      "model": "<LLM API embeddings model name, e.g. text-embedding-ada-002>"
+    }
   }
   ```
 - Response body: 
-  - Query result: docsId and segmentResultList array
+  - Query result: docsId, segmentResultList array, Token Usage
   - Response body sample
   ```json
   [
@@ -257,7 +269,11 @@ LLM Embedding tool HTTP service
           "metadata": "<json map, segment with>",
           "distance": "<0.x float, segment match distance, smaller means closer>"
         }
-      ]
+      ],
+      "tokenUsage": {
+        "promptToken": "",
+        "totalToken": ""
+      }
     }
   ]
   ```
@@ -275,22 +291,33 @@ LLM Embedding tool HTTP service
     "docsIdList": ["xxxxxxxx", "yyyyyyyy"],
     "queryText": "<Query Text 1>",
     "nResults": "<UInt, return query result by sort number>",
-    "removeDuplicates": "<(Optional)boolean, default:true, return segments will be removed if same text>"
+    "removeDuplicates": "<(Optional)boolean, default:true, return segments will be removed if same text>",
+    "llmConfig": {
+      "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
+      "apiKey": "<LLM API apiKey, e.g. sk-xxxxxxxxxx>",
+      "model": "<LLM API embeddings model name, e.g. text-embedding-ada-002>"
+    }
   }
   ```
 - Response body:
   - Query result: segment info array, include docsId, segmentId, segment text, metadata, distance
   - Response body sample
   ```json
-  [
-    {
-      "docsId": "xxxxxxxx",
-      "segmentId": "<Segment Id>",
-      "text": "<Segment text>",
-      "metadata": "<json map, segment with>",
-      "distance": "<0.x float, segment match distance, smaller means closer>"
+  {
+    "segmentResultList": [
+      {
+        "docsId": "xxxxxxxx",
+        "segmentId": "<Segment Id>",
+        "text": "<Segment text>",
+        "metadata": "<json map, segment with>",
+        "distance": "<0.x float, segment match distance, smaller means closer>"
+      }
+    ],
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
     }
-  ]
+  }
   ```
 
 ##### [POST] /segment/list
@@ -325,7 +352,7 @@ LLM Embedding tool HTTP service
 
 - Feature: Insert segment by index. If not index, new segment will be inserted at last
 - Request params: 
-  - docsId, new segment, index
+  - docsId, new segment, index, LLM Config
   - Sample
   ```json
   {
@@ -334,15 +361,24 @@ LLM Embedding tool HTTP service
       "text": "<Segment text>",
       "metadata": "<json map, segment with>"
     },
-    "index": "(Optional) UInt, if null or large than length, be inserted at last"
+    "index": "(Optional) UInt, if null or large than length, be inserted at last",
+    "llmConfig": {
+      "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
+      "apiKey": "<LLM API apiKey, e.g. sk-xxxxxxxxxx>",
+      "model": "<LLM API embeddings model name, e.g. text-embedding-ada-002>"
+    }
   }
   ```
 - Response body: 
-  - new Segment ID
+  - new Segment ID, Token Usage
   - Response body sample
   ```json
   {
-    "segmentId": "xxxxxxxx"
+    "segmentId": "xxxxxxxx",
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 
@@ -350,7 +386,7 @@ LLM Embedding tool HTTP service
 
 - Feature: Update segment
 - Request params: 
-  - docsId, segment
+  - docsId, segment, LLM Config
   - Sample
   ```json
   {
@@ -359,15 +395,24 @@ LLM Embedding tool HTTP service
       "segmentId": "Segment Id",
       "text": "<Segment text>",
       "metadata": "<json map, segment with>"
+    },
+    "llmConfig": {
+      "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
+      "apiKey": "<LLM API apiKey, e.g. sk-xxxxxxxxxx>",
+      "model": "<LLM API embeddings model name, e.g. text-embedding-ada-002>"
     }
   }
   ```
 - Response body: 
-  - Segment Id
+  - Segment Id, Token Usage
   - Response body sample
   ```json
   {
-    "segmentId": "xxxxxxxx"
+    "segmentId": "xxxxxxxx",
+    "tokenUsage": {
+      "promptToken": "",
+      "totalToken": ""
+    }
   }
   ```
 
