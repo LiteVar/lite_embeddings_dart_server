@@ -33,7 +33,6 @@
 #### 3.1 HTTP命令
 - 用于控制文档的增删改查，包括：
   - [/version](#get-version)：版本号，用于确认server在运行
-  - [/init](#post-init)：初始化嵌入服务，传入大模型相关设置
   - [/docs/create-by-text](#post-docscreate-by-text)：创建文档，传入完整文本和分隔符，服务自动分割，写入向量数据库
   - [/docs/create](#post-docscreate)：创建文档，传入手工分割并结构化后的数据，写入向量数据库
   - [/docs/delete](#post-docsdelete)：删除文档，传入文档的id
@@ -46,7 +45,6 @@
   - [/segment/insert](#post-segmentinsert)：按位置插入新的片段，如果没有位置信息，默认排到最后
   - [/segment/update](#post-segmentupdate)：更新片段
   - [/segment/delete](#post-segmentdelete)：删除片段
-  - [/dispose](#post-dispose)：断开向量数据库的连接
 
 ##### BaseURL
 - `http://127.0.0.1:9537/api`
@@ -63,32 +61,19 @@
   }
   ```
 
-##### [POST] /init
-
-- 功能：初始化嵌入服务，传入大模型相关设置
-- 请求参数：无
-
-- 返回：
-  - 初始化的信息，包括向量数据库名字
-  - 返回样例
-  ```json
-    {
-      "vectorDatabase": "<向量数据库名字，例如：chroma>"
-    }
-  ```
-
 ##### [POST] /docs/create-by-text
 
 - 功能：创建文档，传入完整文本和分隔符，服务自动分割，写入向量数据库
 - 请求参数：
   - 文档相关：文件名、全文、分隔符、元数据、大模型配置
+  - 关于元数据：可选，为每个分段都一样的metadata。系统会默认生成带有`vdb`和`embeddings_model`的metadata
   - 请求样例
   ```json
   {
     "docsName": "<文档的名称，例如：摩尔定律使用于一切.md>",
     "text": "<文档的文本全文，带有分隔符>",
     "separator": "<分隔符的文本>",
-    "metadata": "<json map，结构体的值只支持数字、文本、布尔值，不支持对象和数组，每个片段都使用相同的metadata>",
+    "metadata": "<（可选）每个分段的metadata：json map，结构体的值只支持数字、文本、布尔值，不支持对象和数组，每个片段都使用相同的metadata>",
     "llmConfig": {
       "baseUrl": "<大模型API的baseUrl，例如：https://api.openai.com/v1>>",
       "apiKey": "<大模型API的apiKey，例如：sk-xxxxxxxxxx>",
@@ -115,6 +100,7 @@
 - 功能：创建文档，传入手工分割并结构化后的数据，写入向量数据库
 - 请求参数：
   - 文档相关：文件名、各个片段及其对应的元数据、大模型配置
+  - 关于元数据：可选，系统会默认生成带有`vdb`和`embeddings_model`的metadata
   - 请求样例
   ```json
   {
@@ -122,7 +108,7 @@
     "segmentList": [
       { 
         "text": "<片段的原文>",
-        "metadata": "<json map，结构体的值只支持数字、文本、布尔值，不支持对象和数组>"
+        "metadata": "<可选，json map，结构体的值只支持数字、文本、布尔值，不支持对象和数组>"
       }
     ],
     "llmConfig": {
@@ -360,13 +346,14 @@
 - 功能：按位置插入新的片段，如果没有位置信息，默认排到最后
 - 请求参数：
   - 文档Id、新的片段信息、插入位置、大模型配置
+  - 关于元数据：可选，系统会默认生成带有`vdb`和`embeddings_model`的metadata
   - 请求样例
   ```json
   {
     "docsId": "xxxxxxxx",
     "segment": {
       "text": "<片段文字>",
-      "metadata": "<json map，片段附带的metadata>"
+      "metadata": "<可选，json map，片段附带的metadata>"
     },
     "index": "（可选）正整数，如果为空，或者大于原长度，则默认添加到末尾",
     "llmConfig": {
@@ -394,6 +381,10 @@
 - 功能：更新片段
 - 请求参数：
   - 文档Id、新的片段信息、大模型配置
+  - 关于元数据，可选，有如下情况：
+    - `null`：不更新原有metadata
+    - `{}`：清空
+    - 有数值：增加或是变更到原有meta中
   - 请求样例
   ```json
   {
@@ -401,7 +392,7 @@
     "segment": {
       "segmentId": "<片段Id>",
       "text": "<片段文字>",
-      "metadata": "<json map，片段附带的metadata>"
+      "metadata": "<可选，json map，片段附带的metadata>"
     },
     "llmConfig": {
       "baseUrl": "<大模型API的baseUrl，例如：https://api.openai.com/v1>>",
@@ -442,17 +433,6 @@
   {
     "segmentId": "xxxxxxxx"
   }
-  ```
-
-##### [POST] /dispose
-
-- 功能：断开向量数据库的连接
-- 请求参数：
-- 返回：
-  - 断开成功的信息
-  - 返回样例
-  ```
-  "Dispose successfully."
   ```
 
 ## 构建运行

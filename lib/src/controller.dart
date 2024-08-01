@@ -16,6 +16,8 @@ final embeddingsController = EmbeddingsController();
 class EmbeddingsController {
   late EmbeddingsService embeddingsService;
 
+  EmbeddingsController() { _init(); }
+
   Future<Response> getVersion(Request request) async {
     logger.log(LogModule.http, "Request getVersion");
     VersionDto versionDto = VersionDto(version: config.version);
@@ -23,37 +25,17 @@ class EmbeddingsController {
     return Response.ok(jsonEncode(versionDto.toJson()));
   }
 
-  Future<Response> init(Request request) async {
-
-    try {
-      String vdbType = config.vdb.type;
-      String vdbBaseUrl = config.vdb.baseUrl;
-      VectorDatabase vectorDatabase;
-      if (vdbType.toLowerCase() == VDBType.CHROMA) {
-        vectorDatabase = Chroma(baseUrl: vdbBaseUrl);
-        embeddingsService = EmbeddingsService(vectorDatabase);
-
-        logger.log(LogModule.http, "Response init", detail: jsonEncode({
-          "vectorDatabase": vdbType.toLowerCase()
-        }));
-
-        embeddingsService.init();
-
-        return Response.ok(jsonEncode({
-          "vectorDatabase": vdbType.toLowerCase()
-        }));
-      } else {
-        return Response.internalServerError(body: "Not Support Vector Database");
-      }
-    } on VectorDatabaseException catch (e) {
-      logger.log(LogModule.http, "Response init VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: "", level: Level.WARNING);
-      return Response.badRequest(body: jsonEncode(e.toJson()));
-    }  on FormatException catch (e) {
-      logger.log(LogModule.http, "Response init FormatException: ${e}", detail: "", level: Level.WARNING);
-      return Response.badRequest(body: e);
-    } catch (e) {
-      logger.log(LogModule.http, "Response init Exception: ${e}", detail: "", level: Level.WARNING);
-      return Response.internalServerError(body: e);
+  void _init() {
+    String vdbType = config.vdb.type;
+    String vdbBaseUrl = config.vdb.baseUrl;
+    VectorDatabase vectorDatabase;
+    if (vdbType.toLowerCase() == VDBType.CHROMA) {
+      vectorDatabase = Chroma(baseUrl: vdbBaseUrl);
+      embeddingsService = EmbeddingsService(vectorDatabase);
+      embeddingsService.init();
+      logger.log(LogModule.http, "EmbeddingsController init", detail: "vectorDatabase type: " + vdbType);
+    } else {
+      logger.log(LogModule.http, "EmbeddingsController init", detail: "vectorDatabase type: " + vdbType + ", NOT supported", level: Level.WARNING);
     }
   }
 
@@ -337,24 +319,6 @@ class EmbeddingsController {
       return Response.badRequest(body: e);
     } catch (e) {
       logger.log(LogModule.http, "Response deleteSegment Exception: ${e}", detail: payload, level: Level.WARNING);
-      return Response.internalServerError(body: e);
-    }
-  }
-
-  Future<Response> dispose(Request request) async {
-    try {
-      await embeddingsService.dispose();
-
-      logger.log(LogModule.http, "Response dispose", detail: "Dispose successfully.");
-      return Response.ok("Dispose successfully.");
-    } on VectorDatabaseException catch (e) {
-      logger.log(LogModule.http, "Response dispose VectorDatabaseException: ${jsonEncode(e.toJson())}", detail: "", level: Level.WARNING);
-      return Response.badRequest(body: jsonEncode(e.toJson()));
-    }  on FormatException catch (e) {
-      logger.log(LogModule.http, "Response dispose FormatException: ${e}", detail: "", level: Level.WARNING);
-      return Response.badRequest(body: e);
-    } catch (e) {
-      logger.log(LogModule.http, "Response dispose Exception: ${e}", detail: "", level: Level.WARNING);
       return Response.internalServerError(body: e);
     }
   }

@@ -5,7 +5,6 @@ final Router apiRouter = Router();
 
 void apiRoutes() {
   apiRouter.get('/version', embeddingsController.getVersion);
-  apiRouter.post('/init', embeddingsController.init);
   apiRouter.post('/docs/create-by-text', embeddingsController.createDocsByText);
   apiRouter.post('/docs/create', embeddingsController.createDocs);
   apiRouter.post('/docs/delete', embeddingsController.deleteDocs);
@@ -18,5 +17,4 @@ void apiRoutes() {
   apiRouter.post('/segment/insert', embeddingsController.insertSegment);
   apiRouter.post('/segment/update', embeddingsController.updateSegment);
   apiRouter.post('/segment/delete', embeddingsController.deleteSegment);
-  apiRouter.post('/dispose', embeddingsController.dispose);
 }

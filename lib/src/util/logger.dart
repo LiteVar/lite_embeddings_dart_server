@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:logging/logging.dart';
 import '../config.dart';
 
-enum LogModule { http, ws, agent }
+enum LogModule { http }
 
 EmbeddingsLogger logger = EmbeddingsLogger(config.log.level);
 

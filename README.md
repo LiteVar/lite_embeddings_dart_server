@@ -31,9 +31,8 @@ LLM Embedding tool HTTP service
 - [HTTP API](#31-http-API)
 
 #### 3.1 HTTP API
-- Docs CRUD API, include: 
+- Docs API, include: 
   - [/version](#get-version): get version number, to confirm server running
-  - [/init](#post-init): post the llm config to initial the embeddings service
   - [/docs/create-by-text](#post-docscreate-by-text): Create docs embeddings, post whole text and separator, service will split and write to vector database
   - [/docs/create](#post-docscreate): Create docs embeddings, post the split docs, service will write to vector database
   - [/docs/delete](#post-docsdelete): Delete docs, post docsId
@@ -46,7 +45,6 @@ LLM Embedding tool HTTP service
   - [/segment/insert](#post-segmentinsert): Insert segment by index. If not index, new segment will be inserted at last
   - [/segment/update](#post-segmentupdate): Update segment
   - [/segment/delete](#post-segmentdelete): Delete segment
-  - [/dispose](#post-dispose): Dispose vector database connection
 
 ##### BaseURL
 - `http://127.0.0.1:9537/api`
@@ -63,23 +61,19 @@ LLM Embedding tool HTTP service
   }
   ```
 
-##### [POST] /init
-
-- Feature: post the llm config to initial the embeddings service
-- Request params: null
-
 ##### [POST] /docs/create-by-text
 
 - Feature: Create docs embeddings, post whole text and separator, service will split and write to vector database
 - Request params: 
   - Docs info: docsName, text, separator, metadata, LLM Config
+  - About metadata: Optional, same metadata for each segment. Default metadata include `vdb` and `embeddings_model`.
   - Sample
   ```json
   {
     "docsName": "<Docs name, e.g. Moore's Law for Everything.md>",
     "text": "<Docs full text, with separetor>",
     "separator": "<Separator text>",
-    "metadata": "<json map, value only int, float, string, bool, NOT support object and array. Each segment with same metadata>",
+    "metadata": "<Optional, in each segment, json map, value only int, float, string, bool, NOT support object and array. Each segment with same metadata>",
     "llmConfig": {
       "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
       "apiKey": "<LLM API apiKey, e.g. sk-xxxxxxxxxx>",
@@ -106,6 +100,7 @@ LLM Embedding tool HTTP service
 - Feature: Create docs embeddings, post the split docs, service will write to vector database
 - Request params: 
   - Docs info: docsName, segment and metadata array, LLM Config
+  - About metadata: Optional, default metadata include `vdb` and `embeddings_model`.
   - Sample
   ```json
   {
@@ -113,7 +108,7 @@ LLM Embedding tool HTTP service
     "segmentList": [
       { 
         "text": "<Segment text>",
-        "metadata": "<json map, value only int, float, string, bool, NOT support object and array>"
+        "metadata": "<Optional, json map, value only int, float, string, bool, NOT support object and array>"
       }
     ],
     "llmConfig": {
@@ -353,13 +348,14 @@ LLM Embedding tool HTTP service
 - Feature: Insert segment by index. If not index, new segment will be inserted at last
 - Request params: 
   - docsId, new segment, index, LLM Config
+  - About metadata: Optional, default metadata include `vdb` and `embeddings_model`.
   - Sample
   ```json
   {
     "docsId": "xxxxxxxx",
     "segment": {
       "text": "<Segment text>",
-      "metadata": "<json map, segment with>"
+      "metadata": "<Optional, json map, segment with>"
     },
     "index": "(Optional) UInt, if null or large than length, be inserted at last",
     "llmConfig": {
@@ -387,6 +383,10 @@ LLM Embedding tool HTTP service
 - Feature: Update segment
 - Request params: 
   - docsId, segment, LLM Config
+  - About metadata, optional:
+    - `null`: NOT update current metadata
+    - `{}`: clear metadata
+    - values: add or update current metadata
   - Sample
   ```json
   {
@@ -394,7 +394,7 @@ LLM Embedding tool HTTP service
     "segment": {
       "segmentId": "Segment Id",
       "text": "<Segment text>",
-      "metadata": "<json map, segment with>"
+      "metadata": "<Optional, json map, segment with>"
     },
     "llmConfig": {
       "baseUrl": "<LLM API baseUrl, e.g. https://api.openai.com/v1>>",
@@ -435,17 +435,6 @@ LLM Embedding tool HTTP service
   {
     "segmentId": "xxxxxxxx"
   }
-  ```
-
-##### [POST] /dispose
-
-- Feature: Dispose vector database connection
-- Request params: 
-- Response body: 
-    - Dispose successfully text
-    - Response body sample
-  ```
-  "Dispose successfully."
   ```
 
 ## Build and Run
