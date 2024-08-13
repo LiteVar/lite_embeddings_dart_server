@@ -385,7 +385,7 @@ LLM Embedding tool HTTP service
   - docsId, segment, LLM Config
   - About metadata, optional:
     - `null`: NOT update current metadata
-    - `{}`: clear metadata
+    - `{}`: clear metadata, but remain default metadata include `vdb` and `embeddings_model`
     - values: add or update current metadata
   - Sample
   ```json

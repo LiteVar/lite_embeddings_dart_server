@@ -1,6 +1,6 @@
 name: lite_embeddings_dart_server
 description: LLM Embedding tool HTTP service.
-version: 0.2.0
+version: 0.3.0
 repository: https://github.com/LiteVar/lite_embeddings_dart_server
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
   shelf: ^1.4.0
   shelf_router: ^1.1.0
   json_annotation: ^4.9.0
-  lite_embeddings_dart: ^0.2.0
+  lite_embeddings_dart: ^0.3.0
   logging: ^1.2.0
 
 dev_dependencies:
